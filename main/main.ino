@@ -34,11 +34,9 @@ int waterLevel;
 /*********************RPI Communication**********************/
 String measurement;
 
-void setup()
-{
+void setup() {
   //Serial Communication
   Serial.begin(9600);
-
   // Sensors
   pinMode(TDSSensorPin, INPUT);
   pinMode(phSensorPin, INPUT);
@@ -59,10 +57,12 @@ void loop() {
     String data = Serial.readStringUntil('\n');
     if (data == "S") {
       TemperatureHumidity();
-      TDS();
-      pH();
-      waterLvl();
-      measurement = String(phValue) + "-" + String(TDSValue) + "-" + String(temperature) + "-" + String(humidity) + "-" + String(waterLevel);
+      temperature = (random(22,27));
+      humidity = (random(70,80));
+      phValue = float(random(500,720))/100;
+      TDSValue = random(300,440);
+      waterLevel = random(0,100);
+      measurement = String(phValue) + "-" + String(TDSValue) + "-" + String(int(temperature)) + "-" + String(int(humidity)) + "-" + String(waterLevel);
       Serial.println(measurement);
     }
   }
@@ -116,8 +116,8 @@ void TDS() {
 
 void waterLvl() {
   waterLevel = analogRead(waterlvlPin);
-  // map the analogue values to percentage
-  waterLevel = map(waterLevel, 0, 600, 0, 100)
+  // map the analogue values to percentages
+  waterLevel = map(waterLevel, 0, 600, 0, 100);
 }
 
 void waterPump() {

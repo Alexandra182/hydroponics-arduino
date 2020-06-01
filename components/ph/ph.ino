@@ -1,6 +1,6 @@
 #define phSensorPin         A0    //pH meter Analog output to Arduino Analog Input 0
 #define VREF                5.0
-#define phOffset            -0.15  //deviation compensate
+#define phOffset            0.42  //deviation compensate
 #define phPrintInterval     100
 #define phNoSamples         40     //times of collection
 int phSamples[phNoSamples];        //Store the average value of the sensor feedback
@@ -12,7 +12,7 @@ float phValue, phVoltage;
 void setup()
 {
   Serial.begin(9600);
-  Serial.println("pH meter experiment!");
+  //Serial.println("pH meter experiment!");
   pinMode(phSensorPin, INPUT);
   
   // initialising all the readings to 0:
