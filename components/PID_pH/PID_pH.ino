@@ -63,10 +63,16 @@ void loop()
     delay(5000); // wait for pH to stabilised
   } else {
     Serial.println("pH is ok!");
-    for (int i = 1; i++; i <= counter) {
-      Serial.println(pHValues[i]);
-      Serial.println(outputValues[i]);
-      Serial.println(errorValues[i]);
+    for (int i = 0; i++; i <= counter) {
+      Serial.print(String(pHValues[i]) + " ");
+    }
+    Serial.println();
+    for (int i = 0; i++; i <= counter) {
+      Serial.print(String(outputValues[i]) + " ");
+    }
+    Serial.println();
+    for (int i = 0; i++; i <= counter) {
+      Serial.print(String(errorValues[i]) + " ");
     }
   }
 }

@@ -29,7 +29,10 @@ int waterLevel;
 #define waterPumpPin 6
 
 /*************************Air Pump***************************/
+#include "SimpleTimer.h"
 #define airPumpPin 7
+SimpleTimer timer;
+bool onState = false;
 
 /*********************RPI Communication**********************/
 String measurement;
@@ -37,10 +40,12 @@ String measurement;
 void setup() {
   //Serial Communication
   Serial.begin(9600);
+
   // Sensors
   pinMode(TDSSensorPin, INPUT);
   pinMode(phSensorPin, INPUT);
   pinMode(waterlvlPin, INPUT);
+  dht.begin();
 
   // Actuators
   pinMode(waterPumpPin, OUTPUT);
@@ -49,19 +54,21 @@ void setup() {
   digitalWrite(waterPumpPin, HIGH);
   digitalWrite(airPumpPin, HIGH);
 
-  dht.begin();
+  // Air Pump Timer
+  timer.setInterval(3000, airPump);
 }
 
 void loop() {
+  timer.run();
   if (Serial.available() > 0) {
     String data = Serial.readStringUntil('\n');
     if (data == "S") {
       TemperatureHumidity();
-      temperature = (random(22,27));
-      humidity = (random(70,80));
-      phValue = float(random(500,720))/100;
-      TDSValue = random(300,440);
-      waterLevel = random(0,100);
+      temperature = (random(22, 27));
+      humidity = (random(70, 80));
+      phValue = float(random(500, 720)) / 100;
+      TDSValue = random(300, 440);
+      waterLevel = random(0, 100);
       measurement = String(phValue) + "-" + String(TDSValue) + "-" + String(int(temperature)) + "-" + String(int(humidity)) + "-" + String(waterLevel);
       Serial.println(measurement);
     }
@@ -127,7 +134,13 @@ void waterPump() {
 }
 
 void airPump() {
-  digitalWrite(airPumpPin, LOW);
-  delay(1000);
-  digitalWrite(airPumpPin, HIGH);
+  if (onState) {
+    //digitalWrite(airPumpPin, LOW); // turn on
+    digitalWrite(airPumpPin, HIGH); // DE STERS DUPA CE TERMIN
+    Serial.println("LOW");
+  } else {
+    digitalWrite(airPumpPin, HIGH); // turn off
+    Serial.println("HIGH");
+  }
+  onState = !onState;
 }
