@@ -2,7 +2,7 @@
 #define phSensorPin         A0    //pH meter Analog output to Arduino Analog Input 0
 #define VREF                5.0
 #define phOffset            0.42  //deviation compensate
-#define phNoSamples         40     //times of collection
+#define phNoSamples         20     //times of collection
 float phTotal = 0;
 float phAverage = 0;
 float phValue, phVoltage;
@@ -11,17 +11,18 @@ float phValue, phVoltage;
 #define waterPumpPin 6
 
 /************************PID Variables**************************/
-double kp = -700;
-double ki = 0;
-double kd = 0;
+double kp = -1000;
+double ki = -2;
+double kd = -100;
 
 unsigned long currentTime, previousTime;
 double elapsedTime;
 double error, lastError;
 double input, output, setPoint;
 double cummulativeError, rateError;
+int outMin, outMax;
 
-float pHValues[100], outputValues[100], errorValues[100];
+float pHValues[50], outputValues[50], errorValues[50];
 int counter = 0;
 
 void setup() {
@@ -39,16 +40,20 @@ void loop()
 {
   pH();
   input = phValue;
+  Serial.println(phValue);
 
   if (phValue < 5.5) {
     Serial.println("pH is too low! Change the water!");
-  } else if (phValue > 6.5) {
+  } else if (phValue > 6.0) {
     output = computePID(input);
 
     Serial.println("Input: " + String(input));
     Serial.println("Output: " + String(output));
     Serial.println("Setpoint: " + String(setPoint));
-    Serial.println("Error" + String(error));
+    Serial.println("Error: " + String(error));
+    Serial.println("Cummulative Error: " + String(cummulativeError));
+    Serial.println("Rate Error: " + String(rateError));
+    Serial.println("Elapsed Time: " + String(elapsedTime));
     Serial.println();
 
     pHValues[counter] = input;
@@ -56,22 +61,22 @@ void loop()
     errorValues[counter] = error;
     counter++;
 
-    digitalWrite(waterPumpPin, LOW);
+    //digitalWrite(waterPumpPin, LOW);
     delay(output);
     digitalWrite(waterPumpPin, HIGH);
 
-    delay(5000); // wait for pH to stabilised
+    delay(10000); // wait for pH to stabilised
   } else {
     Serial.println("pH is ok!");
-    for (int i = 0; i++; i <= counter) {
+    for (int i = 0; i <= counter; i++) {
       Serial.print(String(pHValues[i]) + " ");
     }
     Serial.println();
-    for (int i = 0; i++; i <= counter) {
+    for (int i = 0; i <= counter; i++) {
       Serial.print(String(outputValues[i]) + " ");
     }
     Serial.println();
-    for (int i = 0; i++; i <= counter) {
+    for (int i = 0; i <= counter; i++) {
       Serial.print(String(errorValues[i]) + " ");
     }
   }
@@ -80,16 +85,18 @@ void loop()
 double computePID(double input) {
   currentTime = millis(); //get current time
   elapsedTime = (double)(currentTime - previousTime); //compute time elapsed from previous computation
-
+  elapsedTime = elapsedTime/1000; // ms -> s
   error = setPoint - input; // determine error
   cummulativeError += error * elapsedTime; // compute integral
-  rateError = (error - lastError) / elapsedTime; // compute derivative
+  rateError = (error - lastError)/elapsedTime; // compute derivative
 
   double out = kp * error + ki * cummulativeError + kd * rateError; //PID output
 
   lastError = error; //remember current error
   previousTime = currentTime; //remember current time
 
+  if (out < 0) out = 0;
+  
   return out; //have function return the PID output
 }
 

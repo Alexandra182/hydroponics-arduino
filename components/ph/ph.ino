@@ -2,7 +2,7 @@
 #define VREF                5.0
 #define phOffset            0.42  //deviation compensate
 #define phPrintInterval     100
-#define phNoSamples         40     //times of collection
+#define phNoSamples         20     //times of collection
 int phSamples[phNoSamples];        //Store the average value of the sensor feedback
 int phSamplesIndex = 0;
 float phTotal = 0;
