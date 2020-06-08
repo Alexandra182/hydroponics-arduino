@@ -49,7 +49,7 @@ void TDS() {
 
   // calculate the average:
   TDSAverage = TDSTotal / TDSNoSamples;
-  TDSVoltage = TDSAverage * VREF / 1024.0;
+  TDSVoltage = TDSAverage * VREF / 1023.0;
   //temperature compensation formula: fFinalResult(25^C) = fFinalResult(current)/(1.0+0.02*(fTP-25.0));
   TDSCompensationCoefficient = 1.0 + 0.02 * (temperature - 25.0); 
   TDSCompensationVoltage = TDSVoltage / TDSCompensationCoefficient; //temperature compensation

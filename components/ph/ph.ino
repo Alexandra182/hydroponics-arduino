@@ -49,6 +49,6 @@ void pH() {
 
   // calculate the average:
   phAverage = phTotal / phNoSamples;
-  phVoltage = phAverage * VREF / 1024;
+  phVoltage = phAverage * VREF / 1023;
   phValue = 3.5 * phVoltage + phOffset;
 }
