@@ -6,10 +6,12 @@ int waterlvl = 100;
 String measurement;
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
 }
 
 void loop() {
+  Serial.println("Hello!");
+  delay(100);
   if (Serial.available() > 0) {
     String data = Serial.readStringUntil('\n');
     if (data == "S") {

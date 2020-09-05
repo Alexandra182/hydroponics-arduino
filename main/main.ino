@@ -52,7 +52,7 @@ int outMin, outMax;
 
 void setup() {
   //Serial Communication
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   // Sensors
   pinMode(TDSSensorPin, INPUT);
@@ -81,30 +81,29 @@ void loop() {
       TDS();
       waterLvl();
       measurement = String(phValue) + "-" + String(TDSValue) + "-" + String(int(temperature)) + "-" + String(int(humidity)) + "-" + String(waterLevel);
-      Serial.println(measurement);
+      Serial.println(measurement); // Send data to RaspberryPi
     }
   }
 
   pH();
   input = phValue;
-  //Serial.println(phValue);
 
   if (phValue < 5.5) {
     //Serial.println("pH is too low! Change the water!");
   } else if (phValue > 6.0) { // Use PID to adjust the pH
     phStabiliseTime = millis() - PIDstartTime;
-    if (phStabiliseTime >= 10000) { // if 10s have passed the pH is stable
+    if (phStabiliseTime >= 20000) { // if 10s have passed the pH is stable
       output = computePID(input);
+
       /*
-        // code for debugging purposes
-        Serial.println("Input: " + String(input));
-        Serial.println("Output: " + String(output));
-        Serial.println("Setpoint: " + String(setPoint));
-        Serial.println("Error: " + String(error));
-        Serial.println("Cummulative Error: " + String(cummulativeError));
-        Serial.println("Rate Error: " + String(rateError));
-        Serial.println("Elapsed Time: " + String(elapsedTime));
-        Serial.println();
+      Serial.println("Input: " + String(input));
+      Serial.println("Output: " + String(output));
+      Serial.println("Setpoint: " + String(setPoint));
+      Serial.println("Error: " + String(error));
+      Serial.println("Cummulative Error: " + String(cummulativeError));
+      Serial.println("Rate Error: " + String(rateError));
+      Serial.println("Elapsed Time: " + String(elapsedTime));
+      Serial.println();
       */
 
       digitalWrite(waterPumpPin, LOW);
@@ -121,9 +120,9 @@ void TemperatureHumidity() {
   humidity = dht.readHumidity();
   temperature = dht.readTemperature();
 
-  // Check if any reads failed and exit early (to try again).
+  // Check if any reads failed and exit early (to try again)
   if (isnan(humidity) || isnan(temperature)) {
-    //Serial.println(F("Failed to read from the DHT sensor!"));
+    // Serial.println(F("Failed to read from the DHT sensor!"));
     temperature = 25;
     humidity = 50;
     return;
@@ -151,52 +150,43 @@ void TDS() {
   TDSAverage = TDSTotal / TDSNoSamples;
   TDSTotal = 0;
   TDSVoltage = TDSAverage * VREF / 1023.0;
-  //temperature compensation formula: fFinalResult(25^C) = fFinalResult(current)/(1.0+0.02*(fTP-25.0));
+  // temperature compensation formula: fFinalResult(25^C) = fFinalResult(current)/(1.0+0.02*(fTP-25.0));
   TDSCompensationCoefficient = 1.0 + 0.02 * (temperature - 25.0);
-  TDSCompensationVoltage = TDSVoltage / TDSCompensationCoefficient; //temperature compensation
+  TDSCompensationVoltage = TDSVoltage / TDSCompensationCoefficient; // temperature compensation
   TDSValue = (133.42 * pow(TDSCompensationVoltage, 3) - 255.86 * pow(TDSCompensationVoltage, 2) + 857.39 * TDSCompensationVoltage) * 0.5;
 }
 
 void waterLvl() {
   waterLevel = analogRead(waterlvlPin);
-  // map the analogue values to percentages
+  // map the analog values to percentages
   waterLevel = map(waterLevel, 0, 600, 0, 100);
-}
-
-void waterPump() {
-  digitalWrite(waterPumpPin, LOW);
-  delay(1000);
-  digitalWrite(waterPumpPin, HIGH);
 }
 
 void airPump() {
   if (onState) {
-    //digitalWrite(airPumpPin, LOW); // turn on
-    digitalWrite(airPumpPin, HIGH); // DE STERS DUPA CE TERMIN
-    Serial.println("LOW");
+    digitalWrite(airPumpPin, LOW); // turn on
   } else {
     digitalWrite(airPumpPin, HIGH); // turn off
-    Serial.println("HIGH");
   }
   onState = !onState;
 }
 
 double computePID(double input) {
-  currentTime = millis(); //get current time
-  elapsedTime = (double)(currentTime - previousTime); //compute time elapsed from previous computation
+  currentTime = millis(); // get current time
+  elapsedTime = (double)(currentTime - previousTime); // compute time elapsed from previous computation
   elapsedTime = elapsedTime / 1000; // ms -> s
   error = setPoint - input; // determine error
   cummulativeError += error * elapsedTime; // compute integral
   rateError = (error - lastError) / elapsedTime; // compute derivative
 
-  double out = kp * error + ki * cummulativeError + kd * rateError; //PID output
+  double out = kp * error + ki * cummulativeError + kd * rateError; // PID output
 
-  lastError = error; //remember current error
-  previousTime = currentTime; //remember current time
+  lastError = error; // remember current error
+  previousTime = currentTime; // remember current time
 
   if (out < 0) out = 0;
 
-  return out; //have function return the PID output
+  return out; // have function return the PID output
 }
 
 void waterPumpOff() {

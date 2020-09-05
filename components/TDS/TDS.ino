@@ -1,3 +1,7 @@
+/*
+ * TDS sensor test for the SEN0244 Gravity Analog TDS Sensor Meter from DFROBOT
+ */
+
 #define TDSSensorPin         A1   //TDS meter Analog output to Arduino Analog Input 0
 #define VREF                 5.0  //analog reference voltage(Volt) of the ADC
 #define TDSNoSamples         30   //times of collection
@@ -9,10 +13,8 @@ int TDSSamples[TDSNoSamples];        //Store the average value of the sensor fee
 int TDSValue, TDSTotal, TDSAverage;
 int TDSSamplesIndex = 0;
 
-void setup()
-{
+void setup() {
   Serial.begin(9600);
-  Serial.println("TDS meter experiment!");
   pinMode(TDSSensorPin, INPUT);
 
   // initialising all the readings to 0:
@@ -21,8 +23,7 @@ void setup()
   }
 }
 
-void loop()
-{
+void loop() {
   static unsigned long TDSPrintTime = millis();
   if (millis() - TDSPrintTime > TDSPrintInterval)  //every 40 milliseconds,read the analog value from the ADC
   {

@@ -1,18 +1,21 @@
+/*
+ * pH sensor test for the SEN0169 Analog pH Meter Pro from DFROBOT
+ */
+ 
 #define phSensorPin         A0    //pH meter Analog output to Arduino Analog Input 0
 #define VREF                5.0
 #define phOffset            0.42  //deviation compensate
 #define phPrintInterval     100
-#define phNoSamples         20     //times of collection
-int phSamples[phNoSamples];        //Store the average value of the sensor feedback
+#define phNoSamples         20    //times of collection
+
+int phSamples[phNoSamples];       //Store the average value of the sensor feedback
 int phSamplesIndex = 0;
 float phTotal = 0;
 float phAverage = 0;
 float phValue, phVoltage;
 
-void setup()
-{
-  Serial.begin(9600);
-  //Serial.println("pH meter experiment!");
+void setup() {
+  Serial.begin(115200);
   pinMode(phSensorPin, INPUT);
   
   // initialising all the readings to 0:
@@ -21,11 +24,9 @@ void setup()
   }
 }
 
-void loop()
-{
+void loop() {
   static unsigned long pHPrintTime = millis();
-  if (millis() - pHPrintTime > phPrintInterval)
-  {
+  if (millis() - pHPrintTime > phPrintInterval) {
     pH();
     Serial.println(phValue);
     pHPrintTime = millis();

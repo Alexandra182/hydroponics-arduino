@@ -13,7 +13,7 @@ float phValue, phVoltage;
 /************************PID Variables**************************/
 double kp = -1000;
 double ki = -2;
-double kd = -100;
+double kd = 0;
 
 unsigned long currentTime, previousTime;
 double elapsedTime;
@@ -33,11 +33,10 @@ void setup() {
   pinMode(waterPumpPin, OUTPUT);
   digitalWrite(waterPumpPin, HIGH);
 
-  Serial.begin(9600);
+  Serial.begin(115200);
 }
 
-void loop()
-{
+void loop() {
   pH();
   input = phValue;
   Serial.println(phValue);
@@ -47,6 +46,7 @@ void loop()
   } else if (phValue > 6.0) {
     output = computePID(input);
 
+    /*
     Serial.println("Input: " + String(input));
     Serial.println("Output: " + String(output));
     Serial.println("Setpoint: " + String(setPoint));
@@ -55,13 +55,14 @@ void loop()
     Serial.println("Rate Error: " + String(rateError));
     Serial.println("Elapsed Time: " + String(elapsedTime));
     Serial.println();
-
+    */
+    
     pHValues[counter] = input;
     outputValues[counter] = output;
     errorValues[counter] = error;
     counter++;
 
-    //digitalWrite(waterPumpPin, LOW);
+    digitalWrite(waterPumpPin, LOW);
     delay(output);
     digitalWrite(waterPumpPin, HIGH);
 

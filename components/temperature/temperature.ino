@@ -1,6 +1,10 @@
+/*
+ * DHT22 sensor test 
+ */
+ 
 #include "DHT.h"
 
-#define DHTPIN 4     // Digital pin connected to the DHT sensor
+#define DHTPIN 4        // Digital pin connected to the DHT sensor
 #define DHTTYPE DHT22   // DHT 22  (AM2302), AM2321
 
 DHT dht(DHTPIN, DHTTYPE);
